@@ -1987,9 +1987,17 @@
           this.slides.forEach(s => s.classList.add('is-active'));
           this.setupMobileScrollSpy();
         } else {
-          // Desktop: slide-by-slide mode
+          // Desktop: slide-by-slide mode via is-active class toggle
+          this.slides.forEach(s => {
+            s.classList.remove('is-active');
+            s.classList.remove('is-prev');
+          });
           this.slides[0]?.classList.add('is-active');
-          this.setupIntersectionObserver();
+          // Trigger first slide reveal animations
+          const firstReveals = this.slides[0]?.querySelectorAll('.reveal');
+          firstReveals?.forEach((el, i) => {
+            setTimeout(() => el.classList.add('visible'), 150 + 80 * i);
+          });
           this.setupKeyboardNav();
           this.setupTouchNav();
           this.setupWheelNav();
@@ -2013,28 +2021,6 @@
             }
           });
         }, { threshold: 0.3 });
-        this.slides.forEach(slide => observer.observe(slide));
-      }
-
-      /* === Intersection Observer for reveal animations === */
-      setupIntersectionObserver() {
-        const observer = new IntersectionObserver((entries) => {
-          entries.forEach(entry => {
-            if (entry.isIntersecting) {
-              entry.target.classList.add('visible');
-              // Update current slide index
-              const idx = Array.from(this.slides).indexOf(entry.target);
-              if (idx !== -1) {
-                this.currentSlide = idx;
-                this.updateNavDots();
-                this.updateProgressBar();
-              }
-            }
-          });
-        }, {
-          threshold: 0.5
-        });
-
         this.slides.forEach(slide => observer.observe(slide));
       }
 
@@ -2114,7 +2100,24 @@
       /* === Navigate to specific slide === */
       goToSlide(index) {
         if (index < 0 || index >= this.slides.length) return;
-        this.slides[index].scrollIntoView({ behavior: 'smooth' });
+        // Remove active from all slides
+        this.slides.forEach(s => {
+          s.classList.remove('is-active');
+          s.classList.remove('is-prev');
+        });
+        // Mark previous slides for reference
+        for (let i = 0; i < index; i++) {
+          this.slides[i].classList.add('is-prev');
+        }
+        // Activate target slide
+        this.slides[index].classList.add('is-active');
+        // Trigger reveal animations on the new slide
+        const reveals = this.slides[index].querySelectorAll('.reveal');
+        reveals.forEach((el, i) => {
+          el.classList.remove('visible');
+          // Stagger animations
+          setTimeout(() => el.classList.add('visible'), 80 * i);
+        });
         this.currentSlide = index;
         this.updateNavDots();
         this.updateProgressBar();
