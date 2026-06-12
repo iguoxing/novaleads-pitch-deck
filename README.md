@@ -19,3 +19,5 @@ AI驱动的B2B海外精准获客引擎
 - ☎ 13067890063
 - ✉ zhao.guoxing@novaxtra.com
 - 🌐 sales-center.novaxtra.com
+- Website:https://www.novaxtra.com
+- Blog:https://www.novaxtra.com/blog
